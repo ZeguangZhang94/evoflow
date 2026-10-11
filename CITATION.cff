@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "EvoFlow"
+version: 0.1.0
+license: Apache-2.0
+authors:
+  - name: "EvoFlow Contributors"
+abstract: >-
+  EvoFlow 是一个会自己变好的 LLM Agent 框架：三层进化栈（上下文 / 记忆 / 权重）+
+  评估门，用你自己的反馈信号以一杯咖啡的成本持续进化。
+  A self-evolving LLM agent framework that gets better from your own feedback
+  signals — a three-layer evolution stack (context / memory / weights) gated by
+  an Evolution Gate, at coffee-money cost.

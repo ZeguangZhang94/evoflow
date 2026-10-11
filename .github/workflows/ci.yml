@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # 生命线 job：核心包零第三方依赖是 EvoFlow 的硬性承诺，
+  # 该 job 在裸环境（不装任何 extras）下跑全部核心测试。
+  test-core:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: 安装核心包（dev extra 仅含 pytest；核心包本身仍零依赖）
+        run: pip install -e ".[dev]"
+      - name: 运行核心测试
+        run: python -m pytest tests/ -q -m "not train and not vec and not llm"
+      - name: 运行零依赖端到端示例
+        run: python examples/quickstart.py
+      - name: CLI 冒烟
+        run: evoflow --help
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff mypy
+      - run: ruff check src/ tests/ examples/
+      - run: mypy src/evoflow --ignore-missing-imports
+
+  test-train:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 安装训练 extras（仅 CPU 依赖验证导入与配置逻辑）
+        run: pip install -e ".[dev]"
+      - name: 训练后端测试（无 GPU，只验证惰性导入与报错信息）
+        run: python -m pytest tests/ -q -m train

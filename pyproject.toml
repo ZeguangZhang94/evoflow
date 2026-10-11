@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "evoflow"
+version = "0.1.0"
+description = "EvoFlow: 三层进化栈的自进化 Agent 框架（L0 上下文进化 / L1 经验记忆库 / L2 权重层）"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "EvoFlow Contributors" }]
+keywords = ["agent", "self-evolving", "llm", "dpo", "memory", "playbook"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.optional-dependencies]
+train = ["torch>=2.0", "trl>=0.8", "peft>=0.6", "datasets>=2.14"]
+vec = ["numpy>=1.24"]
+vec-qdrant = ["qdrant-client>=1.10"]
+llm = ["openai>=1.0"]
+otel = ["opentelemetry-sdk>=1.20", "langfuse>=2.0"]
+mcp = ["mcp>=1.0"]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+evoflow = "evoflow.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+evoflow = ["py.typed"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+# 基线规则集：语法错误/未用导入/导入排序/现代化语法/常见 bug
+# 意见性规则（BLE001/TRY004/RUF*/C408/SIM 等）不纳入——本项目的
+# "进化循环绝不抛异常"等设计是有意为之。
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+explicit_package_bases = true
+mypy_path = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "train: 需要 evoflow[train] 训练后端的测试",
+    "vec: 需要 evoflow[vec] 向量后端的测试",
+    "llm: 需要 evoflow[llm] 外部 LLM 的测试",
+]
+
+[project.urls]
+Homepage = "https://github.com/ZeguangZhang94/evoflow"
+Documentation = "https://github.com/ZeguangZhang94/evoflow/tree/main/docs"
+Issues = "https://github.com/ZeguangZhang94/evoflow/issues"
